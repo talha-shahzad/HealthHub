@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import  './Options.css';
 
 const Options = ({ onOptionChange }) => {
 
@@ -15,17 +15,17 @@ const Options = ({ onOptionChange }) => {
   };
 
   return (
-    <div>
-      <h1>Options</h1>
+    <div className='container'>
+      <h1>Select Role</h1>
       <select className='selection' defaultValue="Client">
-  <option value="Doctor">Doctor</option>
-  <option value="Client">Client</option>
-  <option value="Admin">Admin</option>
+  <option value="Doctor" className='options'>Doctor</option>
+  <option value="Client"  className='options'>Client</option>
+  <option value="Admin"  className='options'>Admin</option>
 </select>
 
-      <div>
+<div className="button-container">
       <button onClick={handleOption}>
-        <Link to="/login">Login Page</Link>
+        <Link className="button-link" to="/login">Login Page</Link>
         </button>
       </div>
     </div>

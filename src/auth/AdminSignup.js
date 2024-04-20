@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Options.css';
 
 const AdminSignup = () => {
   const [formData, setFormData] = useState({
@@ -26,6 +27,7 @@ const AdminSignup = () => {
   };
 
   return (
+    <div className='container'>
     <form onSubmit={handleSubmit}>
       <h2>Admin Signup</h2>
 
@@ -106,21 +108,9 @@ const AdminSignup = () => {
         </label>
       </div>
 
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            name="termsAndConditions"
-            checked={formData.termsAndConditions}
-            onChange={handleChange}
-            required
-          />
-          Agree to Terms and Conditions
-        </label>
-      </div>
-
       <button type="submit">Signup</button>
     </form>
+    </div>
   );
 };
 

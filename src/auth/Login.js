@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-
+import './Options.css';
 
 const Login = ({ selectedOption }) => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const Login = ({ selectedOption }) => {
         navigate(optval,{replace:true});
       };
     return (
-        <div>
+        <div className='container'>
             <h1>Login</h1>
              <p>Selected Option from Options component: {selectedOption}</p>
             <form onSubmit={handleSubmit}>

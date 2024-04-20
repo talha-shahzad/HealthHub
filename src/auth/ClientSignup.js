@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-
+import { Link } from 'react-router-dom';
+import './Options.css';
 const ClientSignup = () => {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -28,6 +29,7 @@ const ClientSignup = () => {
   };
 
   return (
+    <div className='container'>
     <form onSubmit={handleSubmit}>
       <h2>Client Signup</h2>
 
@@ -99,11 +101,11 @@ const ClientSignup = () => {
       <div>
         <label>
           Gender:
-          <select name="gender" value={formData.gender} onChange={handleChange} required>
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
+          <select className='selection' name="gender" value={formData.gender} onChange={handleChange} required>
+            <option className='options'value="">Select Gender</option>
+            <option className='options' value="Male">Male</option>
+            <option className='options'value="Female">Female</option>
+            <option className='options'value="Other">Other</option>
           </select>
         </label>
       </div>
@@ -111,11 +113,13 @@ const ClientSignup = () => {
       <div>
         <label>
           Medical History (optional):
+          <div>
           <textarea
             name="medicalHistory"
             value={formData.medicalHistory}
             onChange={handleChange}
           ></textarea>
+          </div>
         </label>
       </div>
 
@@ -132,21 +136,13 @@ const ClientSignup = () => {
         </label>
       </div>
 
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            name="termsAndConditions"
-            checked={formData.termsAndConditions}
-            onChange={handleChange}
-            required
-          />
-          Agree to Terms and Conditions
-        </label>
-      </div>
-
       <button type="submit">Signup</button>
+      <button>
+        <Link className="button-link" to="/">Login Page</Link>
+        </button>
     </form>
+   
+    </div>
   );
 };
 

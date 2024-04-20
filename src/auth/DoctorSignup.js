@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import './Options.css';
 const DoctorSignup = () => {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -28,6 +28,7 @@ const DoctorSignup = () => {
   };
 
   return (
+  <div className='container'>
     <form onSubmit={handleSubmit}>
       <h2>Doctor Signup</h2>
 
@@ -134,21 +135,9 @@ const DoctorSignup = () => {
         </label>
       </div>
 
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            name="termsAndConditions"
-            checked={formData.termsAndConditions}
-            onChange={handleChange}
-            required
-          />
-          Agree to Terms and Conditions
-        </label>
-      </div>
-
       <button type="submit">Signup</button>
     </form>
+    </div>
   );
 };
 
