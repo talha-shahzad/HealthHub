@@ -1,0 +1,18 @@
+.Options{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+}
+.Options::click{
+    background-color: #646cff;
+    scale: 1.1;
+
+}
+.Options h1{
+    font-size: 3.2em;
+    line-height: 1.1;
+}
