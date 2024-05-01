@@ -41,10 +41,10 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    specializationID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Specialization'
-    },
+    specializationName: {
+      type: String,
+      required: true
+  },
     clinicOrHospital: {
         type: String
     },
@@ -88,38 +88,112 @@ const adminSchema = new mongoose.Schema({
 
 const Admin = mongoose.model('Admin', adminSchema);
 
-// Appointments Schema
+
+//Appointments Schema
+
 const appointmentSchema = new mongoose.Schema({
-    doctor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Doctor',
-        required: true
-    },
-    patient: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Patient',
-        required: true
-    },
-    appointmentDate: {
-        type: Date,
-        required: true
-    },
-    status: {
-        type: String,
-        enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
-        default: 'Pending'
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+  doctor_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  patient_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  timeSlot_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'TimeSlot',
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+    default: 'Pending'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
+
+//Daily schedule Schema
+const dailyScheduleSchema = new mongoose.Schema({
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    date: {
+      type: Date,
+      required: true
+    },
+    shift_id: {
+      type: String,
+      required: true
+    },
+    startTime: {
+      type: String,
+      required: true
+    },
+    endTime: {
+      type: String,
+      required: true
+    }
+  });
+  
+  const DailySchedule = mongoose.model('DailySchedule', dailyScheduleSchema);
+  
+// TimeSlots Schema
+
+const timeSlotSchema = new mongoose.Schema({
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  shift_id: {
+    type: String,
+    required: true
+  },
+  startTime: {
+    type: String,
+    required: true
+  },
+  endTime: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['Available', 'Booked'],
+    default: 'Available'
+  },
+  appointment_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Appointment',
+    default: null
+  }
+});
+
+const TimeSlot = mongoose.model('TimeSlot', timeSlotSchema);
+
+
 
 // MedicalRecords Schema
 const medicalRecordSchema = new mongoose.Schema({
@@ -164,6 +238,8 @@ module.exports = {
     Patient,
     Admin,
     Appointment,
+    DailySchedule,
+    TimeSlot,
     MedicalRecord,
     Specialization
 };
