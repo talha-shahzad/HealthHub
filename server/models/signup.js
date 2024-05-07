@@ -232,6 +232,78 @@ const specializationSchema = new mongoose.Schema({
 
 const Specialization = mongoose.model('Specialization', specializationSchema);
 
+
+// BloodType Schema
+const BloodTypeSchema = new mongoose.Schema({
+  bloodtype: {
+      type: String,
+      required: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
+});
+
+const BloodType = mongoose.model('BloodType', BloodTypeSchema);
+
+
+const BasicInfoSchema = new mongoose.Schema({
+age: {
+    type: String,
+    required: true
+},
+height: {
+  type: String,
+  required: true
+},
+weight: {
+  type: String,
+  required: true
+},
+userId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'User',
+  required: true
+}
+});
+
+const BasicInfo = mongoose.model('BasicInfo', BasicInfoSchema);
+
+
+
+// Test Result Schema
+
+const TestResultSchema = new mongoose.Schema({
+upperBP: {
+  type: String,
+  required: true
+},
+lowerBP: {
+  type: String,
+  required: true
+},
+heartRate: {
+  type: String,
+  required: true
+},
+date: {
+  type: String,
+  required: true
+},
+userId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'User',
+  required: true
+}
+});
+
+const TestResult = mongoose.model('TestResult', TestResultSchema);
+
+
+
+
 module.exports = {
     User,
     Doctor,
@@ -241,5 +313,8 @@ module.exports = {
     DailySchedule,
     TimeSlot,
     MedicalRecord,
-    Specialization
+    Specialization,
+    BloodType,
+    BasicInfo,
+    TestResult
 };
