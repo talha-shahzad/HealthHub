@@ -1,0 +1,169 @@
+.circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color:white; /* Change color as per your preference */
+    border: 1px solid black; /* Change color as per your preference */
+    margin:10px;
+  }
+  .animation-enabled{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 1px solid black;
+    top: 0;
+    left: 0;
+    border-radius: 50%; /* Ensure it's a perfect circle */
+    animation: pulse 2s ease 1 forwards;
+  }
+  
+  @keyframes pulse {
+    0% {
+      background: linear-gradient(to bottom, transparent 100%);
+    }
+    25% {
+        background: linear-gradient(to bottom, transparent 75%, red 25%);
+      }
+    50% {
+        background: linear-gradient(to bottom, transparent 50%, red 50%);
+      }
+    75% {
+      background: linear-gradient(to bottom, transparent 25%, red 70%);
+    }
+    100% {
+      background-color:rgba(255, 0, 0, 0.767);
+     border:none;
+    }
+  }
+  
+.holder{
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px;
+  margin:0 10px 10px 0;
+  display:flex;
+  flex-direction: row;
+}
+
+.inner-p{
+    font-size: 20px;
+    font-weight: bold;
+    color: black;
+}
+
+.rectangle1 {
+  justify-content: center;
+  border-radius: 10px;;
+  padding: 10px;
+  background-color: rgba(8, 235, 99, 0.744);
+  border: 5px ridge  #7dcd0d;;
+  height: 170px; 
+  width: 340px; 
+  transition: transform 0.3s ease;
+
+  &:hover{
+transform:scale(1.1);
+  }
+}
+
+.rectangle2 {
+  justify-content: center;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: rgba(25, 137, 228, 0.961);
+  border: 5px ridge #133fc3;
+  height: 170px; 
+  width: 340px; 
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for depth */
+  transition: transform 0.3s ease;
+}
+.rectangle2:hover {
+  transform:scale(1.1);
+}
+.water-flow {
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)); /* Gradient for flowing water effect */
+  background-size: 200% auto; /* Background size to cover the entire area */
+  animation: flow 6s linear infinite; /* Apply animation */
+}
+
+
+@keyframes flow {
+  0% {
+    background-position: 0% 50%; 
+  }
+  25% {
+    background-position: 25% 50%; 
+  }
+  50% {
+    background-position: 50% 100%; 
+  }
+  75% {
+    background-position: 75% 50%; 
+  }
+  100% {
+    background-position: 100% 0%; 
+  }
+}
+.inner-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  opacity: 0.5;
+  background-color: white ; /* Change color as per your preference */
+  border: 1px solid black; /* Change color as per your preference */
+  margin: 0 auto; /* Center the circle horizontally */
+  animation: scaleAnimation 2s infinite; /* Add animation */
+}
+
+@keyframes scaleAnimation {
+  0% {
+    width: 150px;
+  height: 150px;
+  }
+  25% {
+    width: 100px;
+  height: 100px;
+  }
+  50% {
+    width: 50px;
+    height: 50px;
+  }
+  75% {
+    width: 100px;
+    height: 100px;
+  }
+ 100% {
+  width: 150px;
+  height: 150px;
+  }
+}
+
+.orange {
+  background-color: #ffc107; /* Orange color */
+  border: 5px ridge  #d49817;
+}
+
+.red {
+  background-color: #dc3545; /* Red color */
+  border: 5px ridge  #990b0b;
+}
+
+
+#basicform {
+  max-width: 90%; /* Limiting the width of the form */
+  margin: 0 auto; /* Center the form horizontally */
+}
+
+#basicform input {
+  width: 100%; /* Take up full width of the parent container */
+  box-sizing: border-box; /* Include padding and border in width calculation */
+  margin-bottom: 10px; /* Add some space between inputs */
+  padding: 8px; /* Add padding for better appearance */
+  border: 1px solid #ccc; /* Add a border for clarity */
+  border-radius: 4px; /* Add border radius for rounded corners */
+}
+
+/* Optional: Add styles for placeholders */
+#basicform input::placeholder {
+  color: #999; /* Placeholder text color */
+}
