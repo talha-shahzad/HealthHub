@@ -1,15 +1,175 @@
 const express = require('express');
 const connectdb = require('./db.js');
 const mongoose = require('mongoose');
-const { User, Admin, Patient, Doctor, MedicalRecord,Appointment,TimeSlot,DailySchedule } = require('./models/signup.js'); // Assuming your signup.js contains User and Doctor models
+const { User, Admin, Patient, Doctor, MedicalRecord,Appointment,TimeSlot,DailySchedule,BloodType,BasicInfo,TestResult  } = require('./models/signup.js'); // Assuming your signup.js contains User and Doctor models
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 
+const OpenAI = require('openai');
+const bodyParser = require("body-parser");
+
+const openai = new OpenAI({
+  apiKey: "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",
+});
+
+
 const app = express();
 
+
 app.use(express.json());
+app.use(bodyParser.json());
 app.use(cors());
 connectdb();
+
+
+app.get("/fetch_user", async (req, res) => {
+  try {
+    const { role } = req.query;
+    const userData = await User.find({ role });
+    return res.status(200).json(userData);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Route to fetch doctor data by user ID before appointment
+app.get("/fetch_doctor/:id", async (req, res) => {
+  console.log(req.body);
+  try {
+    const { id } = req.params;
+    const doctorData = await Doctor.findOne({ user: id });
+    return res.status(200).json(doctorData);
+  } catch (error) {
+    console.error("Error fetching doctor data:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Route to fetch doctor data by user ID
+app.get("/doctor/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    console.log("userid receiving from page", userId);
+    // Find the doctor record using the userId in the Doctor collection
+    const doctorData = await Doctor.findOne({ _id: userId });
+    console.log("Received doctor data", doctorData);
+    if (!doctorData) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
+
+    console.log("userid receiving from page", doctorData.user);
+    // Fetch additional data from the User collection using the userId
+    const userData = await User.findOne({ _id: doctorData.user });
+    if (!userData) {
+      console.log("User not found for ID:", userId);
+      return res.status(404).json({ error: "User not found" });
+    }
+    console.log("Received User data", userData);
+
+    // Combine the doctorData and userData into a single object
+    const combinedData = {
+      ...userData.toObject(), // Convert Mongoose document to JavaScript object
+      ...doctorData.toObject(),
+    };
+
+    console.log("Combined User data", combinedData);
+    const appointmentsCount = await Appointment.countDocuments({
+      doctor_id: userData._id,
+    });
+
+    const appointmentsData = await Appointment.find({
+      doctor_id: userData._id,
+    });
+    if (!appointmentsData) {
+      console.log("appointment user not found for ID:", userData.user);
+    }
+    console.log("Appointment data", appointmentsData);
+    console.log("Received User data", userData);
+    console.log("Fetched Doctor Data:", combinedData);
+    return res
+      .status(200)
+      .json({ ...combinedData, appointmentsCount, appointmentsData });
+  } catch (error) {
+    console.error("Error fetching doctor data:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Define your dataset for fine-tuning
+const healthDataset = [
+  { prompt: "I have a headache. What should I do?", response: "You could try taking a pain reliever and getting some rest. If the headache persists or gets worse, it's best to consult a healthcare professional." },
+  { prompt: "What are the symptoms of COVID-19?", response: "Common symptoms of COVID-19 include fever, cough, and difficulty breathing. However, symptoms can vary from person to person." },
+  // Add more examples...
+];
+
+// Fine-tune the GPT-3.5 model on the health dataset
+async function fineTuneModel() {
+  try {
+      const fineTunedModel = await openai.FineTune.create({
+          model: 'gpt-3.5-turbo-1106',
+          fineTuneData: healthDataset,
+          task: 'text-generation',
+          nEpochs: 3,  // Adjust the number of epochs as needed
+          batchSize: 4,  // Adjust the batch size as needed
+      });
+
+      console.log('Fine-tuning complete.');
+      return fineTunedModel;
+  } catch (error) {
+      console.error('Error fine-tuning the model:', error);
+      throw error;
+  }
+}
+
+// Function to generate a response from the fine-tuned model
+async function generateResponse(prompt, model) {
+  try {
+      const completion = await openai.Completion.create({
+          model: model.id,
+          prompt: `You are a health assistant, skilled in providing medical assistance.\nUser: ${prompt}`,
+          maxTokens: 50,
+          stop: ['\n'], // Stop generation at the end of the response
+      });
+
+      const response = completion.choices[0].text.trim();
+      return response;
+  } catch (error) {
+      console.error('Error generating response:', error);
+      throw error;
+  }
+}
+
+// endpoint for ChatGPT
+app.post("/chat", async (req, res) => {
+  const { prompt } = req.body;
+  // // Prompt guidance (optional)
+  if (!prompt.startsWith("Tell me about") && !prompt.startsWith("What are the symptoms of")) {
+    console.log("Prompt does not start with 'Tell me about' or 'What are the symptoms of'.")
+    res.send("For medical assistance, consider starting your prompt with 'Tell me about' or 'What are the symptoms of' followed by your health concern.");
+    return;
+  }
+  
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo-1106',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a health assistant, skilled in providing medical assistance only and do not provide assistance for any request which is not related to health.',
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ],
+  });
+
+  let responseText = completion.choices[0].message.content;
+  res.send(responseText);
+  // const fineTunedModel = await fineTuneModel();
+  // let responseText = await generateResponse(prompt, fineTunedModel);
+  // res.send(responseText);
+});
 
 app.get('/json', async (req, res) => {
     // Assuming you have an Item model and want to fetch items
@@ -602,6 +762,120 @@ const generateTimeSlots = (startTime, endTime) => {
 
   return timeSlots;
 };
+
+// GET endpoint to check the Blood Type of a user
+app.get('/api/:userId/check_Bloodtype', async (req, res) => {
+  try {
+    console.log(req.params.userId)
+    const bloodType = await BloodType.find({ userId: req.params.userId });
+    console.log("in GET : ",bloodType);
+    res.json(bloodType);
+} catch (error) {
+    console.error('Error fetching doctor schedule:', error);
+    res.status(500).json({ error: 'Internal server error' });
+}
+});
+
+// POST endpoint to post the Blood Type of a user
+app.post('/api/:userId/post_Bloodtype', async (req, res) => {
+  try {
+    const userId = req.body.userId; // Extract userId from URL params
+    
+    const  bloodType = req.body.bloodType; // Extract bloodType from request body
+    console.log(bloodType,userId)
+
+      const newBloodType = new BloodType({
+        userId: userId,
+        bloodtype: bloodType
+      });
+      
+      await newBloodType.save();
+      res.status(201).json({ message: 'Blood type posted successfully' });
+    
+  } catch (error) {
+    console.error('Error posting blood type:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//Basic Info http://localhost:3000/api/${userId}/check_basic_info
+app.get('/api/:userId/check_basic_info', async (req, res) => {
+  try {
+    const basicInfo = await BasicInfo.findOne({ userId: req.params.userId });
+    console.log("biGET : ",basicInfo);
+
+    res.json(basicInfo);
+  } catch (error) {
+    console.error('Error fetching basic info:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/:userId/post_basic_info', async (req, res) => {
+  try {
+    const {userId, age, height, weight } = req.body; // Extract age, height, and weight from request body
+
+    // Create a new basic info document
+    const newBasicInfo = new BasicInfo({
+      age: age,
+      height: height,
+      weight: weight,
+      userId: userId
+    });
+
+    // Save the new basic info document to the database
+    await newBasicInfo.save();
+
+    // Respond with a success message
+    res.status(201).json({ message: 'Basic info posted successfully' });
+
+  } catch (error) {
+    console.error('Error posting basic info:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.get('/api/:userId/check_test_results', async (req, res) => {
+  try {
+    console.log(req.params.userId);
+    const testResults = await TestResult.find({ userId: req.params.userId });
+    console.log("Test results GET:", testResults);
+    res.json(testResults);
+  } catch (error) {
+    console.error('Error fetching test results:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST route to post new test results
+app.post('/api/:userId/post_test_result', async (req, res) => {
+  try {
+    userId=req.params.userId;
+    const { upperBP, lowerBP, heartRate, date } = req.body; 
+    console.log(upperBP, lowerBP, heartRate, date, userId);
+    // Create a new test result document
+    const newTestResult = new TestResult({
+      upperBP: upperBP,
+      lowerBP: lowerBP,
+      heartRate: heartRate,
+      date: date,
+      userId: userId
+    });
+    console.log("Test results POST:", newTestResult);
+    // Save the new test result document to the database
+    await newTestResult.save();
+
+    // Respond with a success message
+    res.status(201).json({ message: 'Test result posted successfully' });
+
+  } catch (error) {
+    console.error('Error posting test result:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 
 app.listen(3000, () => {
