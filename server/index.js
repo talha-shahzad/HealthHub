@@ -875,6 +875,27 @@ app.post('/api/:userId/post_test_result', async (req, res) => {
   }
 });
 
+app.put('/api/:userId/update_basic_info/:objectid', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const objectid = req.params.objectid;
+    console.log("Update Basic Info for user:", userId,objectid);
+
+    // Update the basic info for the user with the given userId and cobjectId
+    await BasicInfo.findOneAndUpdate(
+      { _id: objectid }, // Find the document to update
+      { $set: req.body }, // Update with the request body
+      { new: true } // Return the updated document
+    );
+
+    res.status(200).send(`Basic info for user ${userId} updated successfully.`);
+  } catch (error) {
+    console.error('Error updating basic info:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 
 
