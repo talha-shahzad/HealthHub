@@ -875,6 +875,22 @@ app.post('/api/:userId/post_test_result', async (req, res) => {
   }
 });
 
+
+app.delete('/api/:userId/delete_test_results', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    console.log("Delete : ",userId);
+    // Delete the test results for the user with the given userId
+    await TestResult.deleteMany({ userId: userId });
+
+    res.status(200).send(`Test results for user ${userId} deleted successfully.`);
+  } catch (error) {
+    console.error('Error deleting test results:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 app.put('/api/:userId/update_basic_info/:objectid', async (req, res) => {
   try {
     const userId = req.params.userId;
