@@ -99,8 +99,6 @@ The **AI Virtual Health Assistant** provides intelligent support, offering:
 - **Frontend:** React.js, Tailwind CSS (or other CSS frameworks).  
 - **Backend:** Node.js, Express.js.  
 - **Database:** MongoDB.  
-- **Authentication:** JSON Web Tokens (JWT).  
 - **AI Features:** Integration with AI/ML models for health assistance.  
-
 
 ---
